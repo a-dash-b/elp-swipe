@@ -60,6 +60,33 @@ export type Database = {
         }
         Relationships: []
       }
+      responses: {
+        Row: {
+          created_at: string | null
+          group_code: string
+          id: number
+          member_code: string
+          project_code: string
+          response: number
+        }
+        Insert: {
+          created_at?: string | null
+          group_code: string
+          id?: number
+          member_code: string
+          project_code: string
+          response: number
+        }
+        Update: {
+          created_at?: string | null
+          group_code?: string
+          id?: number
+          member_code?: string
+          project_code?: string
+          response?: number
+        }
+        Relationships: []
+      }
       user_responses: {
         Row: {
           created_at: string | null

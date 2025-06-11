@@ -53,10 +53,10 @@ export const fetchSectors = async (): Promise<string[]> => {
   return uniqueSectors;
 };
 
-// Save user response
+// Save user response to the new responses table
 export const saveUserResponse = async (response: Omit<UserResponse, 'id' | 'created_at'>): Promise<void> => {
   const { error } = await supabase
-    .from('user_responses')
+    .from('responses')
     .insert([response]);
 
   if (error) throw error;
