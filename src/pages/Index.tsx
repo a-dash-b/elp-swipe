@@ -1,11 +1,13 @@
+
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowRight, Users, Hash, Building, Heart } from 'lucide-react';
+import { ArrowRight, Users, Hash, Building, Heart, Loader2 } from 'lucide-react';
 import ProjectSwiper from '@/components/ProjectSwiper';
+import { useSectors } from '@/hooks/useProjects';
 
 type Step = 'group-code' | 'member-code' | 'sector' | 'swiping';
 
@@ -15,19 +17,7 @@ const Index = () => {
   const [memberCode, setMemberCode] = useState('');
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
 
-  // Sample sectors - in real app, these would come from database
-  const sectors = [
-    'Technology',
-    'Healthcare',
-    'Finance',
-    'Education',
-    'Retail',
-    'Manufacturing',
-    'Energy',
-    'Transportation',
-    'Real Estate',
-    'Media & Entertainment'
-  ];
+  const { data: sectors = [], isLoading: sectorsLoading } = useSectors();
 
   const validateCode = (code: string) => {
     return /^\d{4}$/.test(code);
@@ -173,20 +163,27 @@ const Index = () => {
         </div>
         
         <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto">
-            {sectors.map((sector) => (
-              <div key={sector} className="flex items-center space-x-2">
-                <Checkbox
-                  id={sector}
-                  checked={selectedSectors.includes(sector)}
-                  onCheckedChange={() => handleSectorToggle(sector)}
-                />
-                <Label htmlFor={sector} className="text-sm font-normal cursor-pointer">
-                  {sector}
-                </Label>
-              </div>
-            ))}
-          </div>
+          {sectorsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span className="ml-2 text-muted-foreground">Loading sectors...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto">
+              {sectors.map((sector) => (
+                <div key={sector} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={sector}
+                    checked={selectedSectors.includes(sector)}
+                    onCheckedChange={() => handleSectorToggle(sector)}
+                  />
+                  <Label htmlFor={sector} className="text-sm font-normal cursor-pointer">
+                    {sector}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          )}
 
           {selectedSectors.length > 0 && (
             <div className="text-sm text-muted-foreground">
@@ -196,6 +193,7 @@ const Index = () => {
           
           <Button 
             onClick={handleNextStep}
+            disabled={sectorsLoading}
             className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
           >
             Start Swiping <Heart className="ml-2 w-4 h-4" />
@@ -211,7 +209,11 @@ const Index = () => {
         <h2 className="text-2xl font-bold text-foreground mb-2">Project Evaluation</h2>
         <p className="text-muted-foreground">Swipe right to like, left to pass</p>
       </div>
-      <ProjectSwiper selectedSectors={selectedSectors} />
+      <ProjectSwiper 
+        selectedSectors={selectedSectors} 
+        groupCode={groupCode}
+        memberCode={memberCode}
+      />
     </div>
   );
 

@@ -1,62 +1,20 @@
-
 import { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, X, RotateCcw } from 'lucide-react';
+import { Heart, X, RotateCcw, Loader2, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-interface Project {
-  id: number;
-  code: string;
-  description: string;
-  sec: string;
-  cat: string;
-}
-
-const sampleProjects: Project[] = [
-  {
-    id: 1,
-    code: "PROJ001",
-    description: "Develop an intelligent chatbot using natural language processing to handle customer inquiries and support tickets automatically. This system will integrate with existing CRM platforms and provide 24/7 customer support.",
-    sec: "Technology",
-    cat: "AI & Machine Learning"
-  },
-  {
-    id: 2,
-    code: "PROJ002", 
-    description: "Create a blockchain-based platform to track and verify sustainable practices throughout the supply chain process. This will help companies ensure ethical sourcing and reduce environmental impact.",
-    sec: "Technology",
-    cat: "Blockchain"
-  },
-  {
-    id: 3,
-    code: "PROJ003",
-    description: "Build a comprehensive analytics platform to track student engagement and performance in remote learning environments. The system will provide real-time insights for educators.",
-    sec: "Education",
-    cat: "Analytics"
-  },
-  {
-    id: 4,
-    code: "PROJ004",
-    description: "Develop an interactive tool for healthcare professionals to visualize patient data and treatment outcomes. This will improve decision-making and patient care quality.",
-    sec: "Healthcare",
-    cat: "Data Visualization"
-  },
-  {
-    id: 5,
-    code: "PROJ005",
-    description: "Create an IoT-based system to optimize traffic flow and reduce congestion in urban areas using real-time data from sensors and cameras throughout the city.",
-    sec: "Transportation",
-    cat: "IoT & Smart City"
-  }
-];
+import { useProjects } from '@/hooks/useProjects';
+import { useUserResponses } from '@/hooks/useUserResponses';
+import { Project } from '@/lib/database';
 
 interface ProjectSwiperProps {
   selectedSectors: string[];
+  groupCode: string;
+  memberCode: string;
 }
 
-const ProjectSwiper = ({ selectedSectors }: ProjectSwiperProps) => {
+const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiperProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [likedProjects, setLikedProjects] = useState<string[]>([]);
@@ -66,17 +24,34 @@ const ProjectSwiper = ({ selectedSectors }: ProjectSwiperProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
+  const { data: projects = [], isLoading, error } = useProjects();
+  const saveResponseMutation = useUserResponses();
+
   const filteredProjects = selectedSectors.length > 0 
-    ? sampleProjects.filter(project => selectedSectors.includes(project.sec))
-    : sampleProjects;
+    ? projects.filter(project => selectedSectors.includes(project.sec))
+    : projects;
 
   const currentProject = filteredProjects[currentIndex];
   const nextProject = filteredProjects[currentIndex + 1];
 
-  const handleSwipe = (direction: 'like' | 'pass') => {
+  const handleSwipe = async (direction: 'like' | 'pass') => {
     if (isAnimating || !currentProject) return;
 
     setIsAnimating(true);
+    const response = direction === 'like' ? 1 : 0;
+
+    // Save response to database
+    try {
+      await saveResponseMutation.mutateAsync({
+        group_code: groupCode,
+        member_code: memberCode,
+        project_code: currentProject.code,
+        response
+      });
+    } catch (error) {
+      // Error handling is done in the mutation
+      console.error('Failed to save response:', error);
+    }
 
     if (direction === 'like') {
       setLikedProjects(prev => [...prev, currentProject.code]);
@@ -154,6 +129,31 @@ const ProjectSwiper = ({ selectedSectors }: ProjectSwiperProps) => {
       setDragOffset(0);
     }
   };
+
+  if (isLoading) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardContent className="p-8 text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading projects...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardContent className="p-8 text-center">
+          <AlertCircle className="w-8 h-8 text-destructive mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Connection Issue</h3>
+          <p className="text-muted-foreground mb-4">
+            Using sample data. Please check your connection.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (currentIndex >= filteredProjects.length) {
     return (
