@@ -32,6 +32,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode, onBackToSectors
     passedProjects,
     dragOffset,
     isDragging,
+    cardRef,
     currentProject,
     nextProject,
     handleSwipe,
@@ -90,6 +91,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode, onBackToSectors
 
       {/* Card Stack Container */}
       <SwipeCard
+        ref={cardRef}
         project={currentProject}
         nextProject={nextProject}
         dragOffset={dragOffset}

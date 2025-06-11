@@ -1,5 +1,5 @@
 
-import { useRef } from 'react';
+import { forwardRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -17,7 +17,7 @@ interface SwipeCardProps {
   onMouseLeave: () => void;
 }
 
-const SwipeCard = ({
+const SwipeCard = forwardRef<HTMLDivElement, SwipeCardProps>(({
   project,
   nextProject,
   dragOffset,
@@ -27,9 +27,7 @@ const SwipeCard = ({
   onMouseMove,
   onMouseUp,
   onMouseLeave
-}: SwipeCardProps) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-
+}, ref) => {
   const getCardStyle = () => {
     const rotation = dragOffset * 0.1;
     const opacity = Math.max(0.7, 1 - Math.abs(dragOffset) / 200);
@@ -49,7 +47,7 @@ const SwipeCard = ({
   };
 
   return (
-    <div className="relative h-[450px] w-full max-w-lg mx-auto">
+    <div className="relative h-[450px] w-full max-w-2xl mx-auto">
       {/* Next Card (Background) */}
       {nextProject && (
         <Card className="absolute inset-0 transform scale-95 opacity-50 shadow-md">
@@ -86,7 +84,7 @@ const SwipeCard = ({
 
       {/* Current Card */}
       <Card 
-        ref={cardRef}
+        ref={ref}
         className="absolute inset-0 shadow-xl transition-all duration-200 select-none"
         style={getCardStyle()}
         onMouseDown={onMouseDown}
@@ -131,6 +129,8 @@ const SwipeCard = ({
       </Card>
     </div>
   );
-};
+});
+
+SwipeCard.displayName = "SwipeCard";
 
 export default SwipeCard;
