@@ -151,8 +151,8 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
   if (currentIndex >= filteredProjects.length) {
     return (
       <Card className="w-full max-w-2xl mx-auto">
-        <CardContent className="p-8 text-center">
-          <div className="mb-6">
+        <CardContent className="p-8">
+          <div className="text-center mb-6">
             <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
               <Heart className="w-8 h-8 text-white" />
             </div>
@@ -160,9 +160,43 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
             <p className="text-muted-foreground mb-4">
               Responses recorded! Message Akhil (8527447321) with your group code once everyone's done for a summary dashboard of commonly and individually liked projects with full descriptions!
             </p>
-            <div className="space-y-2 text-sm">
-              <p className="text-green-600 font-medium">❤️ Liked: {likedProjects.length} projects</p>
-              <p className="text-red-600 font-medium">✖️ Passed: {passedProjects.length} projects</p>
+          </div>
+
+          {/* Liked Projects Section */}
+          <div className="mb-6">
+            <h4 className="text-lg font-semibold text-green-600 mb-3 flex items-center">
+              ❤️ Liked Projects ({likedProjects.length})
+            </h4>
+            {likedProjects.length > 0 ? (
+              <ScrollArea className="h-32 w-full border rounded-lg p-3">
+                <div className="flex flex-wrap gap-2">
+                  {likedProjects.map((projectCode, index) => (
+                    <Badge 
+                      key={index}
+                      variant="secondary" 
+                      className="bg-green-100 text-green-800 border-green-200"
+                    >
+                      {projectCode}
+                    </Badge>
+                  ))}
+                </div>
+              </ScrollArea>
+            ) : (
+              <p className="text-muted-foreground text-sm italic">No projects were liked</p>
+            )}
+          </div>
+
+          {/* Summary Stats */}
+          <div className="mb-6 p-4 bg-muted/30 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div>
+                <p className="text-2xl font-bold text-green-600">{likedProjects.length}</p>
+                <p className="text-sm text-muted-foreground">Projects Liked</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-red-600">{passedProjects.length}</p>
+                <p className="text-sm text-muted-foreground">Projects Passed</p>
+              </div>
             </div>
           </div>
           
