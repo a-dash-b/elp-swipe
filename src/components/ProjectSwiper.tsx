@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -57,10 +56,6 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
 
     if (direction === 'like') {
       setLikedProjects(prev => [...prev, currentProject.code]);
-      toast({
-        title: "Project Liked! ❤️",
-        description: `You liked "${currentProject.code}"`,
-      });
     } else {
       setPassedProjects(prev => [...prev, currentProject.code]);
       toast({
