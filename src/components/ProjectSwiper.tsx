@@ -3,6 +3,7 @@ import { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Heart, X, RotateCcw, Loader2, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useProjects } from '@/hooks/useProjects';
@@ -220,7 +221,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
   return (
     <div className="space-y-4">
       {/* Card Stack Container */}
-      <div className="relative h-96">
+      <div className="relative h-[500px]">
         {/* Next Card (Background) */}
         {nextProject && (
           <Card className="absolute inset-0 transform scale-95 opacity-50 shadow-md">
@@ -229,13 +230,18 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
                 {/* Project Code Header */}
                 <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4 text-center">
                   <h3 className="text-lg font-bold">{nextProject.code}</h3>
+                  {nextProject.title && (
+                    <p className="text-sm opacity-90 mt-1">{nextProject.title}</p>
+                  )}
                 </div>
                 
                 {/* Description */}
-                <div className="flex-1 p-4 flex items-center">
-                  <p className="text-muted-foreground text-sm line-clamp-6">
-                    {nextProject.description}
-                  </p>
+                <div className="flex-1 p-4">
+                  <ScrollArea className="h-full">
+                    <p className="text-muted-foreground text-sm">
+                      {nextProject.description}
+                    </p>
+                  </ScrollArea>
                 </div>
                 
                 {/* Footer */}
@@ -268,16 +274,21 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
             />
             
             <div className="h-full flex flex-col relative z-20">
-              {/* Project Code Header */}
+              {/* Project Code and Title Header */}
               <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 text-center">
                 <h3 className="text-xl font-bold">{currentProject.code}</h3>
+                {currentProject.title && (
+                  <p className="text-sm opacity-90 mt-2">{currentProject.title}</p>
+                )}
               </div>
               
-              {/* Description */}
-              <div className="flex-1 p-6 flex items-center">
-                <p className="text-foreground leading-relaxed">
-                  {currentProject.description}
-                </p>
+              {/* Scrollable Description */}
+              <div className="flex-1 p-6">
+                <ScrollArea className="h-full">
+                  <p className="text-foreground leading-relaxed">
+                    {currentProject.description}
+                  </p>
+                </ScrollArea>
               </div>
               
               {/* Footer */}
