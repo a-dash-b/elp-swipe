@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -49,6 +48,10 @@ const Index = () => {
         setCurrentStep('swiping');
         break;
     }
+  };
+
+  const handleBackToSectors = () => {
+    setCurrentStep('sector');
   };
 
   const renderStepIndicator = () => {
@@ -213,6 +216,7 @@ const Index = () => {
         selectedSectors={selectedSectors} 
         groupCode={groupCode}
         memberCode={memberCode}
+        onBackToSectors={handleBackToSectors}
       />
     </div>
   );

@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Heart, X, RotateCcw, Loader2, AlertCircle } from 'lucide-react';
+import { Heart, X, RotateCcw, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useProjects } from '@/hooks/useProjects';
 import { useUserResponses } from '@/hooks/useUserResponses';
@@ -13,9 +13,10 @@ interface ProjectSwiperProps {
   selectedSectors: string[];
   groupCode: string;
   memberCode: string;
+  onBackToSectors?: () => void;
 }
 
-const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiperProps) => {
+const ProjectSwiper = ({ selectedSectors, groupCode, memberCode, onBackToSectors }: ProjectSwiperProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [likedProjects, setLikedProjects] = useState<string[]>([]);
@@ -199,17 +200,30 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
               </div>
             </div>
           </div>
-          
-          <Button 
-            onClick={() => {
-              setCurrentIndex(0);
-              setLikedProjects([]);
-              setPassedProjects([]);
-            }}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700"
-          >
-            Start Over
-          </Button>
+
+          <div className="flex flex-col space-y-3">
+            {onBackToSectors && (
+              <Button 
+                onClick={onBackToSectors}
+                variant="outline"
+                className="w-full border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50"
+              >
+                <ArrowLeft className="mr-2 w-4 h-4" />
+                Change Sectors
+              </Button>
+            )}
+            
+            <Button 
+              onClick={() => {
+                setCurrentIndex(0);
+                setLikedProjects([]);
+                setPassedProjects([]);
+              }}
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700"
+            >
+              Start Over
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
