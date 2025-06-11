@@ -34,12 +34,22 @@ export const fetchSectors = async (): Promise<string[]> => {
   const { data, error } = await supabase
     .from('projects')
     .select('sec')
+    .not('sec', 'is', null)
+    .neq('sec', '')
     .order('sec');
 
   if (error) throw error;
   
-  // Extract unique sectors
-  const uniqueSectors = [...new Set(data?.map(item => item.sec) || [])];
+  console.log('Raw sectors data from database:', data);
+  
+  // Extract unique sectors and filter out any null/undefined/empty values
+  const uniqueSectors = [...new Set(
+    data?.map(item => item.sec)
+      .filter(sec => sec && sec.trim().length > 0) || []
+  )];
+  
+  console.log('Processed unique sectors:', uniqueSectors);
+  
   return uniqueSectors;
 };
 
