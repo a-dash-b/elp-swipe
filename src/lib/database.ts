@@ -23,61 +23,38 @@ export interface UserResponse {
   created_at?: string;
 }
 
-// Fetch all projects with error handling and retry logic
-export const fetchProjects = async (retryCount = 0): Promise<Project[]> => {
-  try {
-    const { data, error } = await supabase
-      .from('projects')
-      .select('*')
-      .order('id');
+// Fetch all projects with error handling
+export const fetchProjects = async (): Promise<Project[]> => {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .order('id');
 
-    if (error) throw error;
-    return data || [];
-  } catch (error) {
-    console.error('Error fetching projects:', error);
-    
-    // Retry logic with exponential backoff (max 3 retries)
-    if (retryCount < 3) {
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
-      return fetchProjects(retryCount + 1);
-    }
-    
-    // Return empty array on final failure - component will use sample data
-    throw error;
-  }
+  if (error) throw error;
+  return data || [];
 };
 
 // Fetch unique sectors for filtering
 export const fetchSectors = async (): Promise<string[]> => {
-  try {
-    const { data, error } = await supabase
-      .from('projects')
-      .select('sec')
-      .order('sec');
+  const { data, error } = await supabase
+    .from('projects')
+    .select('sec')
+    .order('sec');
 
-    if (error) throw error;
-    
-    // Extract unique sectors
-    const uniqueSectors = [...new Set(data?.map(item => item.sec) || [])];
-    return uniqueSectors;
-  } catch (error) {
-    console.error('Error fetching sectors:', error);
-    throw error;
-  }
+  if (error) throw error;
+  
+  // Extract unique sectors
+  const uniqueSectors = [...new Set(data?.map(item => item.sec) || [])];
+  return uniqueSectors;
 };
 
 // Save user response
 export const saveUserResponse = async (response: Omit<UserResponse, 'id' | 'created_at'>): Promise<void> => {
-  try {
-    const { error } = await supabase
-      .from('user_responses')
-      .insert([response]);
+  const { error } = await supabase
+    .from('user_responses')
+    .insert([response]);
 
-    if (error) throw error;
-  } catch (error) {
-    console.error('Error saving user response:', error);
-    throw error;
-  }
+  if (error) throw error;
 };
 
 // Check database connection

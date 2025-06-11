@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowRight, Users, Hash, Building, Heart, Loader2 } from 'lucide-react';
 import ProjectSwiper from '@/components/ProjectSwiper';
-import { useSectors } from '@/hooks/useProjects';
+import { useSectorsWithFallback } from '@/hooks/useProjects';
 
 type Step = 'group-code' | 'member-code' | 'sector' | 'swiping';
 
@@ -17,7 +16,7 @@ const Index = () => {
   const [memberCode, setMemberCode] = useState('');
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
 
-  const { data: sectors = [], isLoading: sectorsLoading } = useSectors();
+  const { data: sectors = [], isLoading: sectorsLoading } = useSectorsWithFallback();
 
   const validateCode = (code: string) => {
     return /^\d{4}$/.test(code);

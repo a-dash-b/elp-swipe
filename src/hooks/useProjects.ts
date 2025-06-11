@@ -50,8 +50,10 @@ export const useProjects = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    // Use sample data as fallback
-    select: (data) => data?.length > 0 ? data : sampleProjects,
+    // Use sample data as fallback on error
+    onError: (error) => {
+      console.error('Error fetching projects:', error);
+    },
   });
 };
 
@@ -61,7 +63,39 @@ export const useSectors = () => {
     queryFn: fetchSectors,
     staleTime: 10 * 60 * 1000, // 10 minutes
     retry: 2,
-    // Use sample sectors as fallback
-    select: (data) => data?.length > 0 ? data : sampleSectors,
+    // Use sample sectors as fallback on error
+    onError: (error) => {
+      console.error('Error fetching sectors:', error);
+    },
   });
+};
+
+// Hook to get projects with sample data fallback
+export const useProjectsWithFallback = () => {
+  const { data, error, isLoading, isError } = useProjects();
+  
+  // Return sample data if there's an error or no data
+  const projects = isError || !data?.length ? sampleProjects : data;
+  
+  return {
+    data: projects,
+    isLoading,
+    isError,
+    error
+  };
+};
+
+// Hook to get sectors with sample data fallback
+export const useSectorsWithFallback = () => {
+  const { data, error, isLoading, isError } = useSectors();
+  
+  // Return sample sectors if there's an error or no data
+  const sectors = isError || !data?.length ? sampleSectors : data;
+  
+  return {
+    data: sectors,
+    isLoading,
+    isError,
+    error
+  };
 };
