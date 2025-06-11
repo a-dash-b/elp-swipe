@@ -1,5 +1,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import SwipeCard from '@/components/swiper/SwipeCard';
 import SwipeActions from '@/components/swiper/SwipeActions';
@@ -71,6 +73,21 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode, onBackToSectors
 
   return (
     <div className="space-y-4">
+      {/* Back to Sectors Button */}
+      {onBackToSectors && (
+        <div className="flex justify-center">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onBackToSectors}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Sectors
+          </Button>
+        </div>
+      )}
+
       {/* Card Stack Container */}
       <SwipeCard
         project={currentProject}
@@ -82,7 +99,6 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode, onBackToSectors
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onBackToSectors={onBackToSectors}
       />
 
       {/* Action Buttons */}
