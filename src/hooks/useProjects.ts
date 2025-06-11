@@ -7,13 +7,15 @@ const sampleProjects = [
   {
     id: 1,
     code: "PROJ001",
+    title: "AI Customer Support Chatbot",
     description: "Develop an intelligent chatbot using natural language processing to handle customer inquiries and support tickets automatically. This system will integrate with existing CRM platforms and provide 24/7 customer support.",
     sec: "Technology",
     cat: "AI & Machine Learning"
   },
   {
     id: 2,
-    code: "PROJ002", 
+    code: "PROJ002",
+    title: "Blockchain Supply Chain Tracker", 
     description: "Create a blockchain-based platform to track and verify sustainable practices throughout the supply chain process. This will help companies ensure ethical sourcing and reduce environmental impact.",
     sec: "Technology",
     cat: "Blockchain"
@@ -21,6 +23,7 @@ const sampleProjects = [
   {
     id: 3,
     code: "PROJ003",
+    title: "Student Engagement Analytics Platform",
     description: "Build a comprehensive analytics platform to track student engagement and performance in remote learning environments. The system will provide real-time insights for educators.",
     sec: "Education",
     cat: "Analytics"
@@ -28,6 +31,7 @@ const sampleProjects = [
   {
     id: 4,
     code: "PROJ004",
+    title: "Healthcare Data Visualization Tool",
     description: "Develop an interactive tool for healthcare professionals to visualize patient data and treatment outcomes. This will improve decision-making and patient care quality.",
     sec: "Healthcare",
     cat: "Data Visualization"
@@ -35,6 +39,7 @@ const sampleProjects = [
   {
     id: 5,
     code: "PROJ005",
+    title: "Smart City Traffic Optimization",
     description: "Create an IoT-based system to optimize traffic flow and reduce congestion in urban areas using real-time data from sensors and cameras throughout the city.",
     sec: "Transportation",
     cat: "IoT & Smart City"

@@ -36,6 +36,36 @@ export type Database = {
         }
         Relationships: []
       }
+      proj2: {
+        Row: {
+          cat: string | null
+          code: string | null
+          created_at: string | null
+          description: string | null
+          id: number
+          sec: string | null
+          title: string | null
+        }
+        Insert: {
+          cat?: string | null
+          code?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          sec?: string | null
+          title?: string | null
+        }
+        Update: {
+          cat?: string | null
+          code?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          sec?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           cat: string | null
