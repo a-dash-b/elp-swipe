@@ -18,10 +18,10 @@ export interface UserResponse {
   created_at?: string;
 }
 
-// Fetch all projects with error handling
+// Fetch all projects from the new proj table
 export const fetchProjects = async (): Promise<Project[]> => {
   const { data, error } = await supabase
-    .from('projects')
+    .from('proj')
     .select('*')
     .order('id');
 
@@ -29,10 +29,10 @@ export const fetchProjects = async (): Promise<Project[]> => {
   return data || [];
 };
 
-// Fetch unique sectors for filtering
+// Fetch unique sectors from the new proj table
 export const fetchSectors = async (): Promise<string[]> => {
   const { data, error } = await supabase
-    .from('projects')
+    .from('proj')
     .select('sec')
     .not('sec', 'is', null)
     .neq('sec', '')
@@ -40,7 +40,7 @@ export const fetchSectors = async (): Promise<string[]> => {
 
   if (error) throw error;
   
-  console.log('Raw sectors data from database:', data);
+  console.log('Raw sectors data from proj table:', data);
   
   // Extract unique sectors and filter out any null/undefined/empty values
   const uniqueSectors = [...new Set(
@@ -66,7 +66,7 @@ export const saveUserResponse = async (response: Omit<UserResponse, 'id' | 'crea
 export const checkConnection = async (): Promise<boolean> => {
   try {
     const { error } = await supabase
-      .from('projects')
+      .from('proj')
       .select('count')
       .limit(1);
     
@@ -74,4 +74,13 @@ export const checkConnection = async (): Promise<boolean> => {
   } catch {
     return false;
   }
+};
+
+// Bulk insert projects from CSV data
+export const insertProjectsFromCSV = async (projects: Omit<Project, 'id'>[]): Promise<void> => {
+  const { error } = await supabase
+    .from('proj')
+    .insert(projects);
+
+  if (error) throw error;
 };
