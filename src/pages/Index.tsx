@@ -1,10 +1,9 @@
-
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowRight, Users, Hash, Building, Heart } from 'lucide-react';
 import ProjectSwiper from '@/components/ProjectSwiper';
 
@@ -14,8 +13,9 @@ const Index = () => {
   const [currentStep, setCurrentStep] = useState<Step>('group-code');
   const [groupCode, setGroupCode] = useState('');
   const [memberCode, setMemberCode] = useState('');
-  const [selectedSector, setSelectedSector] = useState('');
+  const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
 
+  // Sample sectors - in real app, these would come from database
   const sectors = [
     'Technology',
     'Healthcare',
@@ -29,16 +29,34 @@ const Index = () => {
     'Media & Entertainment'
   ];
 
+  const validateCode = (code: string) => {
+    return /^\d{4}$/.test(code);
+  };
+
+  const handleCodeChange = (value: string, setter: (value: string) => void) => {
+    // Only allow numeric input and limit to 4 digits
+    const numericValue = value.replace(/\D/g, '').slice(0, 4);
+    setter(numericValue);
+  };
+
+  const handleSectorToggle = (sector: string) => {
+    setSelectedSectors(prev => 
+      prev.includes(sector) 
+        ? prev.filter(s => s !== sector)
+        : [...prev, sector]
+    );
+  };
+
   const handleNextStep = () => {
     switch (currentStep) {
       case 'group-code':
-        if (groupCode.trim()) setCurrentStep('member-code');
+        if (validateCode(groupCode)) setCurrentStep('member-code');
         break;
       case 'member-code':
-        if (memberCode.trim()) setCurrentStep('sector');
+        if (validateCode(memberCode)) setCurrentStep('sector');
         break;
       case 'sector':
-        if (selectedSector) setCurrentStep('swiping');
+        setCurrentStep('swiping');
         break;
     }
   };
@@ -72,8 +90,8 @@ const Index = () => {
           <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
             <Users className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Join Your Group</h2>
-          <p className="text-muted-foreground">Enter your group code to get started</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Enter Group Code</h2>
+          <p className="text-muted-foreground">4-digit sum of last 4 digits of all group members' PGIDs</p>
         </div>
         
         <div className="space-y-4">
@@ -81,16 +99,20 @@ const Index = () => {
             <Label htmlFor="group-code">Group Code</Label>
             <Input
               id="group-code"
-              placeholder="Enter group code..."
+              placeholder="0000"
               value={groupCode}
-              onChange={(e) => setGroupCode(e.target.value)}
-              className="text-center text-lg tracking-widest"
+              onChange={(e) => handleCodeChange(e.target.value, setGroupCode)}
+              className="text-center text-2xl tracking-[0.5em] font-mono"
+              maxLength={4}
             />
+            {groupCode && !validateCode(groupCode) && (
+              <p className="text-sm text-destructive">Must be exactly 4 digits</p>
+            )}
           </div>
           
           <Button 
             onClick={handleNextStep}
-            disabled={!groupCode.trim()}
+            disabled={!validateCode(groupCode)}
             className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
           >
             Continue <ArrowRight className="ml-2 w-4 h-4" />
@@ -107,8 +129,8 @@ const Index = () => {
           <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full flex items-center justify-center">
             <Hash className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Your Member ID</h2>
-          <p className="text-muted-foreground">Enter your unique member code</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Enter Member Code</h2>
+          <p className="text-muted-foreground">Last 4 digits of your PGID</p>
         </div>
         
         <div className="space-y-4">
@@ -116,16 +138,20 @@ const Index = () => {
             <Label htmlFor="member-code">Member Code</Label>
             <Input
               id="member-code"
-              placeholder="Enter member code..."
+              placeholder="0000"
               value={memberCode}
-              onChange={(e) => setMemberCode(e.target.value)}
-              className="text-center text-lg tracking-widest"
+              onChange={(e) => handleCodeChange(e.target.value, setMemberCode)}
+              className="text-center text-2xl tracking-[0.5em] font-mono"
+              maxLength={4}
             />
+            {memberCode && !validateCode(memberCode) && (
+              <p className="text-sm text-destructive">Must be exactly 4 digits</p>
+            )}
           </div>
           
           <Button 
             onClick={handleNextStep}
-            disabled={!memberCode.trim()}
+            disabled={!validateCode(memberCode)}
             className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700"
           >
             Continue <ArrowRight className="ml-2 w-4 h-4" />
@@ -137,35 +163,39 @@ const Index = () => {
 
   const renderSectorStep = () => (
     <Card className="w-full max-w-md mx-auto animate-fade-in">
-      <CardContent className="p-8 text-center">
-        <div className="mb-6">
+      <CardContent className="p-8">
+        <div className="mb-6 text-center">
           <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
             <Building className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Choose Sector</h2>
-          <p className="text-muted-foreground">Select the industry sector for project evaluation</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Select Sectors</h2>
+          <p className="text-muted-foreground">Choose sectors to filter projects (optional)</p>
         </div>
         
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="sector">Industry Sector</Label>
-            <Select value={selectedSector} onValueChange={setSelectedSector}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a sector..." />
-              </SelectTrigger>
-              <SelectContent>
-                {sectors.map((sector) => (
-                  <SelectItem key={sector} value={sector}>
-                    {sector}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto">
+            {sectors.map((sector) => (
+              <div key={sector} className="flex items-center space-x-2">
+                <Checkbox
+                  id={sector}
+                  checked={selectedSectors.includes(sector)}
+                  onCheckedChange={() => handleSectorToggle(sector)}
+                />
+                <Label htmlFor={sector} className="text-sm font-normal cursor-pointer">
+                  {sector}
+                </Label>
+              </div>
+            ))}
           </div>
+
+          {selectedSectors.length > 0 && (
+            <div className="text-sm text-muted-foreground">
+              Selected: {selectedSectors.length} sector{selectedSectors.length !== 1 ? 's' : ''}
+            </div>
+          )}
           
           <Button 
             onClick={handleNextStep}
-            disabled={!selectedSector}
             className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
           >
             Start Swiping <Heart className="ml-2 w-4 h-4" />
@@ -181,7 +211,7 @@ const Index = () => {
         <h2 className="text-2xl font-bold text-foreground mb-2">Project Evaluation</h2>
         <p className="text-muted-foreground">Swipe right to like, left to pass</p>
       </div>
-      <ProjectSwiper sector={selectedSector} />
+      <ProjectSwiper selectedSectors={selectedSectors} />
     </div>
   );
 
