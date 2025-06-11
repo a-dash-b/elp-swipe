@@ -58,10 +58,6 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
       setLikedProjects(prev => [...prev, currentProject.code]);
     } else {
       setPassedProjects(prev => [...prev, currentProject.code]);
-      toast({
-        title: "Project Passed",
-        description: `You passed on "${currentProject.code}"`,
-      });
     }
 
     // Animate card out
@@ -129,7 +125,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
 
   if (isLoading) {
     return (
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-2xl mx-auto">
         <CardContent className="p-8 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
           <p className="text-muted-foreground">Loading projects...</p>
@@ -140,7 +136,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
 
   if (error) {
     return (
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-2xl mx-auto">
         <CardContent className="p-8 text-center">
           <AlertCircle className="w-8 h-8 text-destructive mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">Connection Issue</h3>
@@ -154,7 +150,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
 
   if (currentIndex >= filteredProjects.length) {
     return (
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-2xl mx-auto">
         <CardContent className="p-8 text-center">
           <div className="mb-6">
             <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
@@ -187,7 +183,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
 
   if (!currentProject) {
     return (
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-2xl mx-auto">
         <CardContent className="p-8 text-center">
           <p className="text-muted-foreground">No projects found for the selected sectors.</p>
         </CardContent>
@@ -216,7 +212,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
   return (
     <div className="space-y-4">
       {/* Card Stack Container */}
-      <div className="relative h-[500px]">
+      <div className="relative h-[400px]">
         {/* Next Card (Background) */}
         {nextProject && (
           <Card className="absolute inset-0 transform scale-95 opacity-50 shadow-md">
@@ -270,7 +266,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
             
             <div className="h-full flex flex-col relative z-20">
               {/* Project Code and Title Header */}
-              <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 text-center">
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 text-center">
                 <h3 className="text-xl font-bold">{currentProject.code}</h3>
                 {currentProject.title && (
                   <p className="text-sm opacity-90 mt-2">{currentProject.title}</p>
@@ -278,7 +274,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
               </div>
               
               {/* Scrollable Description */}
-              <div className="flex-1 p-6">
+              <div className="flex-1 p-4">
                 <ScrollArea className="h-full">
                   <p className="text-foreground leading-relaxed">
                     {currentProject.description}
@@ -287,7 +283,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
               </div>
               
               {/* Footer */}
-              <div className="p-6 border-t bg-muted/20">
+              <div className="p-4 border-t bg-muted/20">
                 <div className="flex justify-between items-center">
                   <Badge variant="outline" className="text-sm">{currentProject.sec}</Badge>
                   <Badge variant="secondary" className="text-sm">{currentProject.cat}</Badge>
