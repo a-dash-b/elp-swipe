@@ -82,6 +82,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode, onBackToSectors
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onBackToSectors={onBackToSectors}
       />
 
       {/* Action Buttons */}

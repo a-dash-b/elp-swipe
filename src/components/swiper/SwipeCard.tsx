@@ -2,7 +2,9 @@
 import { useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ArrowLeft } from 'lucide-react';
 import { Project } from '@/lib/database';
 
 interface SwipeCardProps {
@@ -15,6 +17,7 @@ interface SwipeCardProps {
   onMouseMove: (e: React.MouseEvent) => void;
   onMouseUp: () => void;
   onMouseLeave: () => void;
+  onBackToSectors?: () => void;
 }
 
 const SwipeCard = ({
@@ -26,7 +29,8 @@ const SwipeCard = ({
   onMouseDown,
   onMouseMove,
   onMouseUp,
-  onMouseLeave
+  onMouseLeave,
+  onBackToSectors
 }: SwipeCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -49,7 +53,7 @@ const SwipeCard = ({
   };
 
   return (
-    <div className="relative h-[400px]">
+    <div className="relative h-[450px] w-full max-w-lg mx-auto">
       {/* Next Card (Background) */}
       {nextProject && (
         <Card className="absolute inset-0 transform scale-95 opacity-50 shadow-md">
@@ -102,8 +106,21 @@ const SwipeCard = ({
           />
           
           <div className="h-full flex flex-col relative z-20">
-            {/* Project Code and Title Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 text-center">
+            {/* Project Code and Title Header with Back Button */}
+            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 text-center relative">
+              {onBackToSectors && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/20"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onBackToSectors();
+                  }}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              )}
               <h3 className="text-xl font-bold">{project.code}</h3>
               {project.title && (
                 <p className="text-sm opacity-90 mt-2">{project.title}</p>
