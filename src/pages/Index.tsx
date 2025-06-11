@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -217,8 +218,8 @@ const Index = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
-      <div className="max-w-4xl mx-auto py-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4 flex flex-col">
+      <div className="max-w-4xl mx-auto py-8 flex-1">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
@@ -237,6 +238,11 @@ const Index = () => {
           {currentStep === 'sector' && renderSectorStep()}
           {currentStep === 'swiping' && renderSwipingStep()}
         </div>
+      </div>
+
+      {/* Footer */}
+      <div className="text-center py-4 text-sm text-muted-foreground">
+        Made with ❤️ by Akhil using Lovable
       </div>
     </div>
   );

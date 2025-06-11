@@ -1,3 +1,4 @@
+
 import { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -165,7 +166,7 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode }: ProjectSwiper
             </div>
             <h3 className="text-2xl font-bold text-foreground mb-2">All Done!</h3>
             <p className="text-muted-foreground mb-4">
-              You've reviewed all projects in the selected sectors.
+              Responses recorded! Message Akhil (8527447321) with your group code once everyone's done for a summary dashboard of commonly and individually liked projects with full descriptions!
             </p>
             <div className="space-y-2 text-sm">
               <p className="text-green-600 font-medium">❤️ Liked: {likedProjects.length} projects</p>
