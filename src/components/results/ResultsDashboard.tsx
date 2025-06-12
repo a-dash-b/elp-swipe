@@ -6,6 +6,7 @@ import QuickReference from './QuickReference';
 import { useResultsData } from '@/hooks/useResultsData';
 import LoadingResults from './LoadingResults';
 import ErrorResults from './ErrorResults';
+import { exportToPDF } from '@/utils/pdfExport';
 
 interface ResultsDashboardProps {
   groupCode: string;
@@ -15,6 +16,16 @@ interface ResultsDashboardProps {
 
 const ResultsDashboard = ({ groupCode, memberCodes, onBackToInput }: ResultsDashboardProps) => {
   const { data, isLoading, error, refetch } = useResultsData(groupCode, memberCodes);
+
+  const handleExportPDF = async () => {
+    if (!data) return;
+    
+    try {
+      await exportToPDF(data);
+    } catch (error) {
+      console.error('Failed to export PDF:', error);
+    }
+  };
 
   if (isLoading) {
     return <LoadingResults />;
@@ -55,9 +66,9 @@ const ResultsDashboard = ({ groupCode, memberCodes, onBackToInput }: ResultsDash
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleExportPDF}>
             <Download className="h-4 w-4 mr-2" />
-            Export
+            Export PDF
           </Button>
         </div>
       </div>
