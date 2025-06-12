@@ -1,13 +1,29 @@
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, BarChart3 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ResultsInput from '@/components/results/ResultsInput';
+import ResultsDashboard from '@/components/results/ResultsDashboard';
 
 const Results = () => {
+  const [step, setStep] = useState<'input' | 'dashboard'>('input');
+  const [groupCode, setGroupCode] = useState('');
+  const [memberCodes, setMemberCodes] = useState<string[]>([]);
+
+  const handleProceedToDashboard = (group: string, members: string[]) => {
+    setGroupCode(group);
+    setMemberCodes(members);
+    setStep('dashboard');
+  };
+
+  const handleBackToInput = () => {
+    setStep('input');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4 flex flex-col">
-      <div className="max-w-4xl mx-auto py-8 flex-1">
+      <div className="max-w-6xl mx-auto py-8 flex-1">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
@@ -16,7 +32,7 @@ const Results = () => {
           <p className="text-muted-foreground">Analyze your project evaluation results</p>
         </div>
 
-        {/* Back Button */}
+        {/* Back to Home Button */}
         <div className="flex justify-center mb-8">
           <Button variant="outline" size="sm" asChild>
             <Link to="/" className="flex items-center gap-2">
@@ -26,27 +42,16 @@ const Results = () => {
           </Button>
         </div>
 
-        {/* Coming Soon Card */}
-        <div className="flex justify-center">
-          <Card className="w-full max-w-2xl">
-            <CardContent className="p-8 text-center">
-              <BarChart3 className="h-16 w-16 mx-auto mb-4 text-purple-500" />
-              <h2 className="text-2xl font-semibold mb-4">Coming Soon</h2>
-              <p className="text-muted-foreground mb-6">
-                The Results Dashboard is currently under development. This will allow you to:
-              </p>
-              <ul className="text-left text-muted-foreground space-y-2 mb-6">
-                <li>• View interactive Venn diagrams of team preferences</li>
-                <li>• See projects liked by all members vs individual choices</li>
-                <li>• Analyze preference patterns and consensus</li>
-                <li>• Export results and generate reports</li>
-              </ul>
-              <p className="text-sm text-muted-foreground">
-                Check back soon for the full analytics experience!
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Content */}
+        {step === 'input' ? (
+          <ResultsInput onProceed={handleProceedToDashboard} />
+        ) : (
+          <ResultsDashboard
+            groupCode={groupCode}
+            memberCodes={memberCodes}
+            onBackToInput={handleBackToInput}
+          />
+        )}
       </div>
 
       {/* Footer */}
