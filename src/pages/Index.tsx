@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3, Users } from 'lucide-react';
 import StepIndicator from '@/components/steps/StepIndicator';
 import GroupCodeStep from '@/components/steps/GroupCodeStep';
 import MemberCodeStep from '@/components/steps/MemberCodeStep';
@@ -96,12 +96,18 @@ const Index = () => {
           </h1>
           <p className="text-muted-foreground mb-4">Discover and evaluate projects with a swipe</p>
           
-          {/* Results Dashboard Link */}
-          <div className="flex justify-center">
+          {/* Navigation Buttons */}
+          <div className="flex justify-center gap-3">
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/team-finder" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Team Finder
+              </Link>
+            </Button>
             <Button variant="outline" size="sm" asChild>
               <Link to="/results" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
-                View Results Dashboard
+                Results Dashboard
               </Link>
             </Button>
           </div>

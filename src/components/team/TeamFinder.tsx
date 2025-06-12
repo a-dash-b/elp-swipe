@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Users, Heart, ArrowLeft, UserCheck, UserX } from 'lucide-react';
-import { findSimilarUsers, getTeamInfo, getSimilarUserSectors, getUserLikedProjects, SimilarUser, TeamInfo } from '@/lib/database';
+import { findSimilarUsers, getTeamInfo, getSimilarUserSectors, getUserLikedProjects, getTeamInfoForUsers, SimilarUser, TeamInfo } from '@/lib/database';
 
 interface TeamFinderProps {
   memberCode: string;
@@ -18,6 +18,7 @@ const TeamFinder = ({ memberCode, groupCode, onBack }: TeamFinderProps) => {
   const [teamInfo, setTeamInfo] = useState<TeamInfo | null>(null);
   const [userSectors, setUserSectors] = useState<Record<string, string[]>>({});
   const [userProjects, setUserProjects] = useState<any[]>([]);
+  const [similarUsersTeamInfo, setSimilarUsersTeamInfo] = useState<Record<string, TeamInfo>>({});
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -35,11 +36,15 @@ const TeamFinder = ({ memberCode, groupCode, onBack }: TeamFinderProps) => {
         setTeamInfo(team);
         setUserProjects(projects);
 
-        // Get sectors for similar users
+        // Get sectors and team info for similar users
         if (similar.length > 0) {
           const memberCodes = similar.map(u => u.similar_member_code);
-          const sectors = await getSimilarUserSectors(memberCodes);
+          const [sectors, teamInfoForUsers] = await Promise.all([
+            getSimilarUserSectors(memberCodes),
+            getTeamInfoForUsers(memberCodes)
+          ]);
           setUserSectors(sectors);
+          setSimilarUsersTeamInfo(teamInfoForUsers);
         }
       } catch (error) {
         console.error('Error loading team finder data:', error);
@@ -65,6 +70,28 @@ const TeamFinder = ({ memberCode, groupCode, onBack }: TeamFinderProps) => {
 
   const userLikedSectors = [...new Set(userProjects.map(p => p.sec).filter(Boolean))];
 
+  const renderTeamStatusBadge = (memberCode: string) => {
+    const userTeamInfo = similarUsersTeamInfo[memberCode];
+    if (!userTeamInfo) return null;
+
+    if (userTeamInfo.is_lone_wolf) {
+      return (
+        <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200">
+          <UserX className="h-3 w-3 mr-1" />
+          Lone Wolf
+        </Badge>
+      );
+    } else {
+      const vacancies = userTeamInfo.team_vacancies || 0;
+      return (
+        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+          <Users className="h-3 w-3 mr-1" />
+          {vacancies} {vacancies === 1 ? 'vacancy' : 'vacancies'}
+        </Badge>
+      );
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -78,7 +105,7 @@ const TeamFinder = ({ memberCode, groupCode, onBack }: TeamFinderProps) => {
         </div>
         <Button variant="outline" onClick={onBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Results
+          Back to Input
         </Button>
       </div>
 
@@ -177,6 +204,7 @@ const TeamFinder = ({ memberCode, groupCode, onBack }: TeamFinderProps) => {
                       <Badge variant="secondary">
                         {user.common_projects_count} common project{user.common_projects_count !== 1 ? 's' : ''}
                       </Badge>
+                      {renderTeamStatusBadge(user.similar_member_code)}
                     </div>
                     <span className="text-sm text-muted-foreground">#{index + 1} match</span>
                   </div>

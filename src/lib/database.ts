@@ -215,7 +215,7 @@ export const getTeamInfo = async (groupCode: string): Promise<TeamInfo> => {
     if (error) throw error;
     
     const memberCount = data || 0;
-    const maxTeamSize = 4; // Assuming max team size is 4
+    const maxTeamSize = 5; // Updated to 5 members max
     const teamVacancies = Math.max(0, maxTeamSize - memberCount);
 
     return {
@@ -230,6 +230,58 @@ export const getTeamInfo = async (groupCode: string): Promise<TeamInfo> => {
       is_lone_wolf: false,
       team_vacancies: 0
     };
+  }
+};
+
+// Get team info for multiple users (for similar users display)
+export const getTeamInfoForUsers = async (memberCodes: string[]): Promise<Record<string, TeamInfo>> => {
+  try {
+    if (memberCodes.length === 0) return {};
+
+    // Get group codes for all members
+    const { data: responses, error } = await supabase
+      .from('responses')
+      .select('member_code, group_code')
+      .in('member_code', memberCodes);
+
+    if (error) throw error;
+
+    // Create a map of member_code to group_code
+    const memberToGroup: Record<string, string> = {};
+    responses?.forEach(response => {
+      if (!memberToGroup[response.member_code]) {
+        memberToGroup[response.member_code] = response.group_code;
+      }
+    });
+
+    // Get unique group codes
+    const uniqueGroups = [...new Set(Object.values(memberToGroup))];
+    
+    // Get team info for each unique group
+    const teamInfoPromises = uniqueGroups.map(async (groupCode) => {
+      const teamInfo = await getTeamInfo(groupCode);
+      return { groupCode, teamInfo };
+    });
+
+    const teamInfoResults = await Promise.all(teamInfoPromises);
+    
+    // Create the final result mapping member codes to their team info
+    const result: Record<string, TeamInfo> = {};
+    
+    memberCodes.forEach(memberCode => {
+      const groupCode = memberToGroup[memberCode];
+      if (groupCode) {
+        const teamInfoResult = teamInfoResults.find(t => t.groupCode === groupCode);
+        if (teamInfoResult) {
+          result[memberCode] = teamInfoResult.teamInfo;
+        }
+      }
+    });
+
+    return result;
+  } catch (error) {
+    console.error('Error getting team info for users:', error);
+    return {};
   }
 };
 
