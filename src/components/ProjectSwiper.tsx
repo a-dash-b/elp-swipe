@@ -56,6 +56,8 @@ const ProjectSwiper = ({ selectedSectors, groupCode, memberCode, onBackToSectors
       <CompletionScreen
         likedProjects={likedProjects}
         passedProjects={passedProjects}
+        groupCode={groupCode}
+        memberCode={memberCode}
         onBackToSectors={onBackToSectors}
         onStartOver={resetSwiper}
       />

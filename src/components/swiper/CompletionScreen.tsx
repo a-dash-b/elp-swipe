@@ -3,23 +3,50 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Heart, ArrowLeft, RotateCcw } from 'lucide-react';
+import { Heart, ArrowLeft, RotateCcw, Users, LayoutDashboard } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface CompletionScreenProps {
   likedProjects: string[];
   passedProjects: string[];
+  groupCode: string;
+  memberCode: string;
   onBackToSectors?: () => void;
   onStartOver: () => void;
-  isAutoRedirect?: boolean; // New prop to indicate auto-redirect
+  isAutoRedirect?: boolean;
 }
 
 const CompletionScreen = ({ 
   likedProjects, 
-  passedProjects, 
+  passedProjects,
+  groupCode,
+  memberCode,
   onBackToSectors, 
   onStartOver,
   isAutoRedirect = false
 }: CompletionScreenProps) => {
+  const navigate = useNavigate();
+
+  const handleTeamFinder = () => {
+    navigate('/team-finder', { 
+      state: { 
+        groupCode, 
+        memberCode,
+        prefilled: true 
+      } 
+    });
+  };
+
+  const handleTeamDashboard = () => {
+    navigate('/results', { 
+      state: { 
+        groupCode, 
+        memberCodes: [memberCode],
+        prefilled: true 
+      } 
+    });
+  };
+
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardContent className="p-8">
@@ -33,7 +60,7 @@ const CompletionScreen = ({
           <p className="text-muted-foreground mb-4">
             {isAutoRedirect 
               ? 'You have already completed your project selections!'
-              : 'Check the results dashboard once all your group members have swiped!'
+              : 'Great work! Now explore your options below:'
             }
           </p>
           {isAutoRedirect && (
@@ -41,6 +68,35 @@ const CompletionScreen = ({
               Previously Completed
             </Badge>
           )}
+        </div>
+
+        {/* Team Navigation Buttons */}
+        <div className="mb-8 space-y-3">
+          <Button
+            onClick={handleTeamFinder}
+            className="w-full h-auto p-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-left"
+          >
+            <div className="flex items-center w-full">
+              <Users className="w-6 h-6 mr-3 flex-shrink-0" />
+              <div className="text-left">
+                <div className="font-semibold">Team Finder</div>
+                <div className="text-sm opacity-90">Find your ideal teammates based on project preferences</div>
+              </div>
+            </div>
+          </Button>
+          
+          <Button
+            onClick={handleTeamDashboard}
+            className="w-full h-auto p-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-left"
+          >
+            <div className="flex items-center w-full">
+              <LayoutDashboard className="w-6 h-6 mr-3 flex-shrink-0" />
+              <div className="text-left">
+                <div className="font-semibold">Team Dashboard</div>
+                <div className="text-sm opacity-90">View group results and analyze project preferences</div>
+              </div>
+            </div>
+          </Button>
         </div>
 
         {/* Liked Projects Section */}
@@ -95,7 +151,8 @@ const CompletionScreen = ({
           
           <Button 
             onClick={onStartOver}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700"
+            variant="outline"
+            className="w-full"
           >
             <RotateCcw className="mr-2 w-4 h-4" />
             {isAutoRedirect ? 'Redo Selections' : 'Start Over'}
