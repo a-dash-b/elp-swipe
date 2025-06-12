@@ -30,6 +30,13 @@ export interface TeamInfo {
   team_vacancies?: number;
 }
 
+export interface Student {
+  id: number;
+  student_name: string;
+  member_code: string;
+  created_at?: string;
+}
+
 // Fetch all projects from the new proj2 table
 export const fetchProjects = async (): Promise<Project[]> => {
   const { data, error } = await supabase
@@ -321,5 +328,63 @@ export const getSimilarUserSectors = async (memberCodes: string[]): Promise<Reco
   } catch (error) {
     console.error('Error getting similar user sectors:', error);
     return {};
+  }
+};
+
+// Get student name by member code
+export const getStudentName = async (memberCode: string): Promise<string> => {
+  try {
+    const { data, error } = await supabase
+      .from('students')
+      .select('student_name')
+      .eq('member_code', memberCode)
+      .single();
+
+    if (error || !data) {
+      return memberCode; // Fallback to member code if name not found
+    }
+
+    return data.student_name;
+  } catch (error) {
+    console.error('Error fetching student name:', error);
+    return memberCode; // Fallback to member code on error
+  }
+};
+
+// Get multiple student names by member codes
+export const getStudentNames = async (memberCodes: string[]): Promise<Record<string, string>> => {
+  try {
+    if (memberCodes.length === 0) return {};
+
+    const { data, error } = await supabase
+      .from('students')
+      .select('member_code, student_name')
+      .in('member_code', memberCodes);
+
+    if (error) throw error;
+
+    const nameMap: Record<string, string> = {};
+    
+    // Create map of member_code to student_name
+    data?.forEach(student => {
+      nameMap[student.member_code] = student.student_name;
+    });
+
+    // For any missing names, use the member code as fallback
+    memberCodes.forEach(code => {
+      if (!nameMap[code]) {
+        nameMap[code] = code;
+      }
+    });
+
+    return nameMap;
+  } catch (error) {
+    console.error('Error fetching student names:', error);
+    // Return fallback map with member codes
+    const fallbackMap: Record<string, string> = {};
+    memberCodes.forEach(code => {
+      fallbackMap[code] = code;
+    });
+    return fallbackMap;
   }
 };

@@ -117,6 +117,27 @@ export type Database = {
         }
         Relationships: []
       }
+      students: {
+        Row: {
+          created_at: string | null
+          id: number
+          member_code: string
+          student_name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          member_code: string
+          student_name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          member_code?: string
+          student_name?: string
+        }
+        Relationships: []
+      }
       user_responses: {
         Row: {
           created_at: string | null

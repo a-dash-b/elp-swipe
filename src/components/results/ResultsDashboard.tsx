@@ -1,11 +1,12 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Download, RefreshCw, Users } from 'lucide-react';
 import VennDiagram from './VennDiagram';
 import QuickReference from './QuickReference';
 import TeamFinder from '@/components/team/TeamFinder';
 import { useResultsData } from '@/hooks/useResultsData';
+import { getStudentNames } from '@/lib/database';
 import LoadingResults from './LoadingResults';
 import ErrorResults from './ErrorResults';
 import { exportToPDF } from '@/utils/pdfExport';
@@ -19,18 +20,50 @@ interface ResultsDashboardProps {
 const ResultsDashboard = ({ groupCode, memberCodes, onBackToInput }: ResultsDashboardProps) => {
   const { data, isLoading, error, refetch } = useResultsData(groupCode, memberCodes);
   const [showTeamFinder, setShowTeamFinder] = useState(false);
+  const [studentNames, setStudentNames] = useState<Record<string, string>>({});
+  const [namesLoading, setNamesLoading] = useState(true);
+
+  // Load student names when data is available
+  useEffect(() => {
+    const loadStudentNames = async () => {
+      if (!data || data.memberResults.length === 0) {
+        setNamesLoading(false);
+        return;
+      }
+
+      try {
+        const allMemberCodes = data.memberResults.map(result => result.memberCode);
+        const names = await getStudentNames(allMemberCodes);
+        setStudentNames(names);
+      } catch (error) {
+        console.error('Error loading student names:', error);
+      } finally {
+        setNamesLoading(false);
+      }
+    };
+
+    loadStudentNames();
+  }, [data]);
 
   const handleExportPDF = async () => {
     if (!data) return;
     
     try {
-      await exportToPDF(data);
+      // Create data with student names for export
+      const dataWithNames = {
+        ...data,
+        memberResults: data.memberResults.map(result => ({
+          ...result,
+          memberName: studentNames[result.memberCode] || result.memberCode
+        }))
+      };
+      await exportToPDF(dataWithNames);
     } catch (error) {
       console.error('Failed to export PDF:', error);
     }
   };
 
-  if (isLoading) {
+  if (isLoading || namesLoading) {
     return <LoadingResults />;
   }
 
@@ -65,6 +98,15 @@ const ResultsDashboard = ({ groupCode, memberCodes, onBackToInput }: ResultsDash
       />
     );
   }
+
+  // Create enhanced data with student names for components
+  const dataWithNames = {
+    ...data,
+    memberResults: data.memberResults.map(result => ({
+      ...result,
+      memberName: studentNames[result.memberCode] || result.memberCode
+    }))
+  };
 
   return (
     <div className="space-y-6">
@@ -124,12 +166,12 @@ const ResultsDashboard = ({ groupCode, memberCodes, onBackToInput }: ResultsDash
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Venn Diagram - Left 2 columns */}
         <div className="lg:col-span-2">
-          <VennDiagram data={data} />
+          <VennDiagram data={dataWithNames} />
         </div>
         
         {/* Quick Reference - Right 1 column */}
         <div className="lg:col-span-1">
-          <QuickReference data={data} />
+          <QuickReference data={dataWithNames} />
         </div>
       </div>
     </div>

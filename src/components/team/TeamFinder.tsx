@@ -5,7 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Users, Heart, ArrowLeft, UserCheck, UserX } from 'lucide-react';
-import { findSimilarUsers, getTeamInfo, getSimilarUserSectors, getUserLikedProjects, getTeamInfoForUsers, SimilarUser, TeamInfo } from '@/lib/database';
+import { 
+  findSimilarUsers, 
+  getTeamInfo, 
+  getSimilarUserSectors, 
+  getUserLikedProjects, 
+  getTeamInfoForUsers, 
+  getStudentName,
+  getStudentNames,
+  SimilarUser, 
+  TeamInfo 
+} from '@/lib/database';
 
 interface TeamFinderProps {
   memberCode: string;
@@ -19,6 +29,8 @@ const TeamFinder = ({ memberCode, groupCode, onBack }: TeamFinderProps) => {
   const [userSectors, setUserSectors] = useState<Record<string, string[]>>({});
   const [userProjects, setUserProjects] = useState<any[]>([]);
   const [similarUsersTeamInfo, setSimilarUsersTeamInfo] = useState<Record<string, TeamInfo>>({});
+  const [currentUserName, setCurrentUserName] = useState<string>('');
+  const [similarUserNames, setSimilarUserNames] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -26,25 +38,29 @@ const TeamFinder = ({ memberCode, groupCode, onBack }: TeamFinderProps) => {
       setIsLoading(true);
       try {
         // Load all data in parallel
-        const [similar, team, projects] = await Promise.all([
+        const [similar, team, projects, userName] = await Promise.all([
           findSimilarUsers(memberCode, 10),
           getTeamInfo(groupCode),
-          getUserLikedProjects(memberCode)
+          getUserLikedProjects(memberCode),
+          getStudentName(memberCode)
         ]);
 
         setSimilarUsers(similar);
         setTeamInfo(team);
         setUserProjects(projects);
+        setCurrentUserName(userName);
 
-        // Get sectors and team info for similar users
+        // Get sectors, team info, and names for similar users
         if (similar.length > 0) {
           const memberCodes = similar.map(u => u.similar_member_code);
-          const [sectors, teamInfoForUsers] = await Promise.all([
+          const [sectors, teamInfoForUsers, names] = await Promise.all([
             getSimilarUserSectors(memberCodes),
-            getTeamInfoForUsers(memberCodes)
+            getTeamInfoForUsers(memberCodes),
+            getStudentNames(memberCodes)
           ]);
           setUserSectors(sectors);
           setSimilarUsersTeamInfo(teamInfoForUsers);
+          setSimilarUserNames(names);
         }
       } catch (error) {
         console.error('Error loading team finder data:', error);
@@ -114,7 +130,7 @@ const TeamFinder = ({ memberCode, groupCode, onBack }: TeamFinderProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <UserCheck className="h-5 w-5" />
-            Your Profile (Member {memberCode})
+            Your Profile ({currentUserName})
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -200,7 +216,7 @@ const TeamFinder = ({ memberCode, groupCode, onBack }: TeamFinderProps) => {
                 <div key={user.similar_member_code} className="p-4 border rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium">Member {user.similar_member_code}</span>
+                      <span className="font-medium">{similarUserNames[user.similar_member_code] || user.similar_member_code}</span>
                       <Badge variant="secondary">
                         {user.common_projects_count} common project{user.common_projects_count !== 1 ? 's' : ''}
                       </Badge>
