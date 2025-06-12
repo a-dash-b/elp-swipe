@@ -37,6 +37,13 @@ export interface Student {
   created_at?: string;
 }
 
+// Helper function to check if a member code should be displayed as "Test Member"
+const isTestMemberCode = (memberCode: string): boolean => {
+  if (memberCode === '0000') return true;
+  const numericCode = parseInt(memberCode, 10);
+  return !isNaN(numericCode) && numericCode >= 1000;
+};
+
 // Fetch all projects from the new proj2 table
 export const fetchProjects = async (): Promise<Project[]> => {
   const { data, error } = await supabase
@@ -334,6 +341,11 @@ export const getSimilarUserSectors = async (memberCodes: string[]): Promise<Reco
 // Get student name by member code
 export const getStudentName = async (memberCode: string): Promise<string> => {
   try {
+    // Check if this is a test member code first
+    if (isTestMemberCode(memberCode)) {
+      return 'Test Member';
+    }
+
     const { data, error } = await supabase
       .from('students')
       .select('student_name')
@@ -356,34 +368,47 @@ export const getStudentNames = async (memberCodes: string[]): Promise<Record<str
   try {
     if (memberCodes.length === 0) return {};
 
-    const { data, error } = await supabase
-      .from('students')
-      .select('member_code, student_name')
-      .in('member_code', memberCodes);
-
-    if (error) throw error;
-
     const nameMap: Record<string, string> = {};
     
-    // Create map of member_code to student_name
-    data?.forEach(student => {
-      nameMap[student.member_code] = student.student_name;
-    });
-
-    // For any missing names, use the member code as fallback
+    // First, handle test member codes
+    const regularMemberCodes: string[] = [];
     memberCodes.forEach(code => {
-      if (!nameMap[code]) {
-        nameMap[code] = code;
+      if (isTestMemberCode(code)) {
+        nameMap[code] = 'Test Member';
+      } else {
+        regularMemberCodes.push(code);
       }
     });
+
+    // Then query database for regular member codes
+    if (regularMemberCodes.length > 0) {
+      const { data, error } = await supabase
+        .from('students')
+        .select('member_code, student_name')
+        .in('member_code', regularMemberCodes);
+
+      if (error) throw error;
+
+      // Add database results to name map
+      data?.forEach(student => {
+        nameMap[student.member_code] = student.student_name;
+      });
+
+      // For any missing regular codes, use the member code as fallback
+      regularMemberCodes.forEach(code => {
+        if (!nameMap[code]) {
+          nameMap[code] = code;
+        }
+      });
+    }
 
     return nameMap;
   } catch (error) {
     console.error('Error fetching student names:', error);
-    // Return fallback map with member codes
+    // Return fallback map with member codes and test member handling
     const fallbackMap: Record<string, string> = {};
     memberCodes.forEach(code => {
-      fallbackMap[code] = code;
+      fallbackMap[code] = isTestMemberCode(code) ? 'Test Member' : code;
     });
     return fallbackMap;
   }
