@@ -32,6 +32,8 @@ export const fetchProjects = async (): Promise<Project[]> => {
 
 // Fetch unique sectors from the new proj2 table
 export const fetchSectors = async (): Promise<string[]> => {
+  console.log('Fetching sectors from proj2 table...');
+  
   const { data, error } = await supabase
     .from('proj2')
     .select('sec')
@@ -39,17 +41,29 @@ export const fetchSectors = async (): Promise<string[]> => {
     .neq('sec', '')
     .order('sec');
 
-  if (error) throw error;
+  console.log('Sectors query result:', { data, error });
+
+  if (error) {
+    console.error('Error fetching sectors:', error);
+    throw error;
+  }
+  
+  if (!data) {
+    console.log('No data returned from sectors query');
+    return [];
+  }
   
   console.log('Raw sectors data from proj2 table:', data);
   
   // Extract unique sectors and filter out any null/undefined/empty values
   const uniqueSectors = [...new Set(
-    data?.map(item => item.sec)
-      .filter(sec => sec && sec.trim().length > 0) || []
+    data.map(item => item.sec)
+      .filter(sec => sec && typeof sec === 'string' && sec.trim().length > 0)
+      .map(sec => sec.trim())
   )];
   
   console.log('Processed unique sectors:', uniqueSectors);
+  console.log('Total unique sectors found:', uniqueSectors.length);
   
   return uniqueSectors;
 };

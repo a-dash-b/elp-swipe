@@ -64,6 +64,11 @@ export const useSectors = () => {
     queryFn: fetchSectors,
     staleTime: 10 * 60 * 1000, // 10 minutes
     retry: 2,
+    meta: {
+      onError: (error: any) => {
+        console.error('useSectors query failed:', error);
+      }
+    }
   });
 };
 
@@ -71,8 +76,20 @@ export const useSectors = () => {
 export const useProjectsWithFallback = () => {
   const { data, error, isLoading, isError } = useProjects();
   
-  // Return sample data if there's an error or no data
-  const projects = isError || !data?.length ? sampleProjects : data;
+  console.log('useProjectsWithFallback:', { 
+    dataLength: data?.length, 
+    isError, 
+    error: error?.message,
+    isLoading 
+  });
+  
+  // Only use sample data if there's a genuine connection error, not just empty results
+  const shouldUseSampleData = isError && error?.message?.toLowerCase().includes('fetch');
+  const projects = shouldUseSampleData ? sampleProjects : (data || []);
+  
+  if (shouldUseSampleData) {
+    console.log('Using sample projects due to connection error');
+  }
   
   return {
     data: projects,
@@ -86,8 +103,24 @@ export const useProjectsWithFallback = () => {
 export const useSectorsWithFallback = () => {
   const { data, error, isLoading, isError } = useSectors();
   
-  // Return sample sectors if there's an error or no data
-  const sectors = isError || !data?.length ? sampleSectors : data;
+  console.log('useSectorsWithFallback:', { 
+    dataLength: data?.length, 
+    isError, 
+    error: error?.message,
+    isLoading 
+  });
+  
+  // Only use sample data if there's a genuine connection error, not just empty results
+  const shouldUseSampleData = isError && error?.message?.toLowerCase().includes('fetch');
+  const sectors = shouldUseSampleData ? sampleSectors : (data || []);
+  
+  if (shouldUseSampleData) {
+    console.log('Using sample sectors due to connection error');
+  } else if (data && data.length > 0) {
+    console.log('Using real sectors from database:', data);
+  } else if (!isLoading) {
+    console.log('No sectors found in database, showing empty list');
+  }
   
   return {
     data: sectors,
