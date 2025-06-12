@@ -27,7 +27,7 @@ const CompletionScreen = ({
           </div>
           <h3 className="text-2xl font-bold text-foreground mb-2">All Done!</h3>
           <p className="text-muted-foreground mb-4">
-            Responses recorded! Message Akhil (8527447321) with your group code once everyone's done for a summary dashboard of commonly and individually liked projects with full descriptions!
+            Check the results dashboard once all your group members have swiped!
           </p>
         </div>
 
