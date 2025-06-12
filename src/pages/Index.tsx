@@ -1,5 +1,8 @@
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { BarChart3 } from 'lucide-react';
 import StepIndicator from '@/components/steps/StepIndicator';
 import GroupCodeStep from '@/components/steps/GroupCodeStep';
 import MemberCodeStep from '@/components/steps/MemberCodeStep';
@@ -91,7 +94,17 @@ const Index = () => {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
             ELP Swipe
           </h1>
-          <p className="text-muted-foreground">Discover and evaluate projects with a swipe</p>
+          <p className="text-muted-foreground mb-4">Discover and evaluate projects with a swipe</p>
+          
+          {/* Results Dashboard Link */}
+          <div className="flex justify-center">
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/results" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                View Results Dashboard
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Step Indicator */}
