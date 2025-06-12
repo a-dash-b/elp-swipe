@@ -34,38 +34,60 @@ export const fetchProjects = async (): Promise<Project[]> => {
 export const fetchSectors = async (): Promise<string[]> => {
   console.log('Fetching sectors from proj2 table...');
   
-  const { data, error } = await supabase
-    .from('proj2')
-    .select('sec')
-    .not('sec', 'is', null)
-    .neq('sec', '')
-    .order('sec');
+  try {
+    // First test basic connection
+    console.log('Testing Supabase connection...');
+    const { data: testData, error: testError } = await supabase
+      .from('proj2')
+      .select('count')
+      .limit(1);
+    
+    console.log('Connection test result:', { testData, testError });
+    
+    // If basic connection fails, throw early
+    if (testError) {
+      console.error('Basic connection failed:', testError);
+      throw new Error(`Connection failed: ${testError.message}`);
+    }
+    
+    // Now try the actual sectors query
+    console.log('Connection successful, fetching sectors...');
+    const { data, error } = await supabase
+      .from('proj2')
+      .select('sec')
+      .not('sec', 'is', null)
+      .neq('sec', '')
+      .order('sec');
 
-  console.log('Sectors query result:', { data, error });
+    console.log('Sectors query result:', { data, error });
 
-  if (error) {
-    console.error('Error fetching sectors:', error);
+    if (error) {
+      console.error('Error fetching sectors:', error);
+      throw new Error(`Sectors query failed: ${error.message}`);
+    }
+    
+    if (!data) {
+      console.log('No data returned from sectors query');
+      return [];
+    }
+    
+    console.log('Raw sectors data from proj2 table:', data);
+    
+    // Extract unique sectors and filter out any null/undefined/empty values
+    const uniqueSectors = [...new Set(
+      data.map(item => item.sec)
+        .filter(sec => sec && typeof sec === 'string' && sec.trim().length > 0)
+        .map(sec => sec.trim())
+    )];
+    
+    console.log('Processed unique sectors:', uniqueSectors);
+    console.log('Total unique sectors found:', uniqueSectors.length);
+    
+    return uniqueSectors;
+  } catch (error) {
+    console.error('fetchSectors error:', error);
     throw error;
   }
-  
-  if (!data) {
-    console.log('No data returned from sectors query');
-    return [];
-  }
-  
-  console.log('Raw sectors data from proj2 table:', data);
-  
-  // Extract unique sectors and filter out any null/undefined/empty values
-  const uniqueSectors = [...new Set(
-    data.map(item => item.sec)
-      .filter(sec => sec && typeof sec === 'string' && sec.trim().length > 0)
-      .map(sec => sec.trim())
-  )];
-  
-  console.log('Processed unique sectors:', uniqueSectors);
-  console.log('Total unique sectors found:', uniqueSectors.length);
-  
-  return uniqueSectors;
 };
 
 // Save user response to the responses table
@@ -80,13 +102,16 @@ export const saveUserResponse = async (response: Omit<UserResponse, 'id' | 'crea
 // Check database connection
 export const checkConnection = async (): Promise<boolean> => {
   try {
-    const { error } = await supabase
+    console.log('Checking database connection...');
+    const { data, error } = await supabase
       .from('proj2')
       .select('count')
       .limit(1);
     
+    console.log('Connection check result:', { data, error, success: !error });
     return !error;
-  } catch {
+  } catch (error) {
+    console.error('Connection check failed:', error);
     return false;
   }
 };

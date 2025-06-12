@@ -3,8 +3,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Building, Heart, Loader2 } from 'lucide-react';
+import { Building, Heart, Loader2, AlertCircle } from 'lucide-react';
 import { useSectorsWithFallback } from '@/hooks/useProjects';
+import { checkConnection } from '@/lib/database';
+import { useEffect, useState } from 'react';
 
 interface SectorStepProps {
   selectedSectors: string[];
@@ -13,7 +15,17 @@ interface SectorStepProps {
 }
 
 const SectorStep = ({ selectedSectors, onSectorToggle, onNext }: SectorStepProps) => {
-  const { data: sectors = [], isLoading: sectorsLoading } = useSectorsWithFallback();
+  const { data: sectors = [], isLoading: sectorsLoading, error } = useSectorsWithFallback();
+  const [connectionStatus, setConnectionStatus] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // Test connection on component mount
+    const testConnection = async () => {
+      const isConnected = await checkConnection();
+      setConnectionStatus(isConnected);
+    };
+    testConnection();
+  }, []);
 
   return (
     <Card className="w-full max-w-md mx-auto animate-fade-in">
@@ -24,6 +36,23 @@ const SectorStep = ({ selectedSectors, onSectorToggle, onNext }: SectorStepProps
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-2">Select Sectors</h2>
           <p className="text-muted-foreground">Choose sectors to filter projects (optional)</p>
+          
+          {/* Connection Status Indicator */}
+          {connectionStatus !== null && (
+            <div className="mt-2 flex items-center justify-center gap-2 text-sm">
+              {connectionStatus ? (
+                <>
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-green-600">Database connected</span>
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="w-4 h-4 text-amber-500" />
+                  <span className="text-amber-600">Using offline data</span>
+                </>
+              )}
+            </div>
+          )}
         </div>
         
         <div className="space-y-4">
