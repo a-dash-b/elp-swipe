@@ -149,7 +149,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      find_similar_users: {
+        Args: { p_member_code: string; p_limit?: number }
+        Returns: {
+          similar_member_code: string
+          common_projects_count: number
+          common_project_codes: string[]
+        }[]
+      }
+      get_team_member_count: {
+        Args: { p_group_code: string }
+        Returns: number
+      }
+      user_has_completed_selections: {
+        Args: { p_group_code: string; p_member_code: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

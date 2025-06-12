@@ -1,8 +1,10 @@
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Download, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Download, RefreshCw, Users } from 'lucide-react';
 import VennDiagram from './VennDiagram';
 import QuickReference from './QuickReference';
+import TeamFinder from '@/components/team/TeamFinder';
 import { useResultsData } from '@/hooks/useResultsData';
 import LoadingResults from './LoadingResults';
 import ErrorResults from './ErrorResults';
@@ -16,6 +18,7 @@ interface ResultsDashboardProps {
 
 const ResultsDashboard = ({ groupCode, memberCodes, onBackToInput }: ResultsDashboardProps) => {
   const { data, isLoading, error, refetch } = useResultsData(groupCode, memberCodes);
+  const [showTeamFinder, setShowTeamFinder] = useState(false);
 
   const handleExportPDF = async () => {
     if (!data) return;
@@ -52,6 +55,17 @@ const ResultsDashboard = ({ groupCode, memberCodes, onBackToInput }: ResultsDash
     );
   }
 
+  // Show Team Finder if requested
+  if (showTeamFinder) {
+    return (
+      <TeamFinder
+        memberCode={memberCodes[0]} // Use first member code for team finder
+        groupCode={groupCode}
+        onBack={() => setShowTeamFinder(false)}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Controls */}
@@ -62,6 +76,15 @@ const ResultsDashboard = ({ groupCode, memberCodes, onBackToInput }: ResultsDash
         </Button>
         
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowTeamFinder(true)}
+            className="bg-purple-50 border-purple-200 hover:bg-purple-100"
+          >
+            <Users className="h-4 w-4 mr-2" />
+            Team Finder
+          </Button>
           <Button variant="outline" size="sm" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh

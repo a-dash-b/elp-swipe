@@ -3,20 +3,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Heart, ArrowLeft } from 'lucide-react';
+import { Heart, ArrowLeft, RotateCcw } from 'lucide-react';
 
 interface CompletionScreenProps {
   likedProjects: string[];
   passedProjects: string[];
   onBackToSectors?: () => void;
   onStartOver: () => void;
+  isAutoRedirect?: boolean; // New prop to indicate auto-redirect
 }
 
 const CompletionScreen = ({ 
   likedProjects, 
   passedProjects, 
   onBackToSectors, 
-  onStartOver 
+  onStartOver,
+  isAutoRedirect = false
 }: CompletionScreenProps) => {
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -25,10 +27,20 @@ const CompletionScreen = ({
           <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
             <Heart className="w-8 h-8 text-white" />
           </div>
-          <h3 className="text-2xl font-bold text-foreground mb-2">All Done!</h3>
+          <h3 className="text-2xl font-bold text-foreground mb-2">
+            {isAutoRedirect ? 'Welcome Back!' : 'All Done!'}
+          </h3>
           <p className="text-muted-foreground mb-4">
-            Check the results dashboard once all your group members have swiped!
+            {isAutoRedirect 
+              ? 'You have already completed your project selections!'
+              : 'Check the results dashboard once all your group members have swiped!'
+            }
           </p>
+          {isAutoRedirect && (
+            <Badge variant="secondary" className="mb-4">
+              Previously Completed
+            </Badge>
+          )}
         </div>
 
         {/* Liked Projects Section */}
@@ -85,7 +97,8 @@ const CompletionScreen = ({
             onClick={onStartOver}
             className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700"
           >
-            Start Over
+            <RotateCcw className="mr-2 w-4 h-4" />
+            {isAutoRedirect ? 'Redo Selections' : 'Start Over'}
           </Button>
         </div>
       </CardContent>

@@ -1,6 +1,5 @@
-
 import { useQuery } from '@tanstack/react-query';
-import { fetchProjects, fetchSectors } from '@/lib/database';
+import { fetchProjects, fetchSectors, checkUserCompletion } from '@/lib/database';
 
 // Sample data as fallback
 const sampleProjects = [
@@ -128,4 +127,15 @@ export const useSectorsWithFallback = () => {
     isError,
     error
   };
+};
+
+// Hook to check if user has completed selections
+export const useUserCompletion = (groupCode: string, memberCode: string) => {
+  return useQuery({
+    queryKey: ['userCompletion', groupCode, memberCode],
+    queryFn: () => checkUserCompletion(groupCode, memberCode),
+    enabled: !!(groupCode && memberCode), // Only run if both codes are provided
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+  });
 };
