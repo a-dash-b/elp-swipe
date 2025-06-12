@@ -22,6 +22,9 @@ const GroupCodeStep = ({ groupCode, onCodeChange, onNext, validateCode }: GroupC
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-2">Enter Group Code</h2>
           <p className="text-muted-foreground">4-digit sum of last 4 digits of all group members' PGIDs</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Don't have a group yet? Input <span className="font-mono font-semibold">0000</span>
+          </p>
         </div>
         
         <div className="space-y-4">

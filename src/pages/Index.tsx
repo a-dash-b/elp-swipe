@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Users } from 'lucide-react';
+import { BarChart3, Users, Zap } from 'lucide-react';
 import StepIndicator from '@/components/steps/StepIndicator';
 import GroupCodeStep from '@/components/steps/GroupCodeStep';
 import MemberCodeStep from '@/components/steps/MemberCodeStep';
@@ -10,10 +10,10 @@ import SectorStep from '@/components/steps/SectorStep';
 import SwipingStep from '@/components/steps/SwipingStep';
 import { validateCode, handleCodeChange } from '@/utils/codeValidation';
 
-type Step = 'group-code' | 'member-code' | 'sector' | 'swiping';
+type Step = 'home' | 'group-code' | 'member-code' | 'sector' | 'swiping';
 
 const Index = () => {
-  const [currentStep, setCurrentStep] = useState<Step>('group-code');
+  const [currentStep, setCurrentStep] = useState<Step>('home');
   const [groupCode, setGroupCode] = useState('');
   const [memberCode, setMemberCode] = useState('');
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
@@ -44,8 +44,70 @@ const Index = () => {
     setCurrentStep('sector');
   };
 
+  const handleStartSwipe = () => {
+    setCurrentStep('group-code');
+  };
+
   const renderCurrentStep = () => {
     switch (currentStep) {
+      case 'home':
+        return (
+          <div className="max-w-2xl mx-auto text-center space-y-8">
+            <div className="space-y-4">
+              <h2 className="text-3xl font-bold text-foreground">Choose Your Journey</h2>
+              <p className="text-muted-foreground text-lg">
+                Discover projects, find teammates, or analyze team preferences
+              </p>
+            </div>
+            
+            <div className="grid gap-6 md:grid-cols-3">
+              {/* Swipe Button */}
+              <Button
+                size="lg"
+                onClick={handleStartSwipe}
+                className="h-32 flex flex-col gap-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+              >
+                <Zap className="h-8 w-8" />
+                <div className="text-center">
+                  <div className="font-bold text-xl">Swipe!</div>
+                  <div className="text-sm opacity-90">Discover Projects</div>
+                </div>
+              </Button>
+
+              {/* Team Finder Button */}
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className="h-32 flex flex-col gap-3 border-2 hover:bg-blue-50"
+              >
+                <Link to="/team-finder" className="flex flex-col gap-3">
+                  <Users className="h-8 w-8" />
+                  <div className="text-center">
+                    <div className="font-bold text-xl">Team Finder</div>
+                    <div className="text-sm text-muted-foreground">Find Teammates</div>
+                  </div>
+                </Link>
+              </Button>
+
+              {/* Team Dashboard Button */}
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className="h-32 flex flex-col gap-3 border-2 hover:bg-green-50"
+              >
+                <Link to="/results" className="flex flex-col gap-3">
+                  <BarChart3 className="h-8 w-8" />
+                  <div className="text-center">
+                    <div className="font-bold text-xl">Team Dashboard</div>
+                    <div className="text-sm text-muted-foreground">View Results</div>
+                  </div>
+                </Link>
+              </Button>
+            </div>
+          </div>
+        );
       case 'group-code':
         return (
           <GroupCodeStep
@@ -95,26 +157,10 @@ const Index = () => {
             ELP Swipe
           </h1>
           <p className="text-muted-foreground mb-4">Discover and evaluate projects with a swipe</p>
-          
-          {/* Navigation Buttons */}
-          <div className="flex justify-center gap-3">
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/team-finder" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Team Finder
-              </Link>
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/results" className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" />
-                Results Dashboard
-              </Link>
-            </Button>
-          </div>
         </div>
 
-        {/* Step Indicator */}
-        <StepIndicator currentStep={currentStep} />
+        {/* Step Indicator - only show when not on home */}
+        {currentStep !== 'home' && <StepIndicator currentStep={currentStep} />}
 
         {/* Current Step Content */}
         <div className="flex justify-center">

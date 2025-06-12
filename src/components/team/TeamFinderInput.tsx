@@ -76,6 +76,9 @@ const TeamFinderInput = ({ onProceed }: TeamFinderInputProps) => {
                   maxLength={4}
                   autoFocus
                 />
+                <p className="text-sm text-muted-foreground text-center">
+                  Don't have a group yet? Input <span className="font-mono font-semibold">0000</span>
+                </p>
                 {errors.group && (
                   <p className="text-sm text-red-500">{errors.group}</p>
                 )}

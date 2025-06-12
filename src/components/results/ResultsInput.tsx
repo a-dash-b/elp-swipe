@@ -76,6 +76,9 @@ const ResultsInput = ({ onProceed }: ResultsInputProps) => {
                 groupCode && !validateCode(groupCode) ? 'border-red-300' : ''
               }`}
             />
+            <p className="text-sm text-muted-foreground text-center">
+              Don't have a group yet? Input <span className="font-mono font-semibold">0000</span>
+            </p>
             {groupCode && !validateCode(groupCode) && (
               <p className="text-sm text-red-500">Please enter a valid 4-digit code</p>
             )}
